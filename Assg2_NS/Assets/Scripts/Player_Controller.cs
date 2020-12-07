@@ -18,8 +18,8 @@ public class Player_Controller : MonoBehaviour
  
     private Rigidbody m_playerRigidbody = null;
 
-    private int m_collectablesTotalCount, m_collectablesCounter;
-    private int count;
+    [SerializeField]private int m_collectablesTotalCount, m_collectablesCounter;
+    [SerializeField] private int count;
 
     private float m_movementX;
     private float m_movementY;
@@ -32,13 +32,11 @@ public class Player_Controller : MonoBehaviour
     {
         m_playerRigidbody = GetComponent<Rigidbody>();
 
-        count = 0;
+        m_collectablesTotalCount =  GameObject.FindGameObjectsWithTag("PickUp").Length;
 
-        m_collectablesTotalCount = 0;
+        count = m_collectablesCounter;
 
-        m_collectablesCounter = 0;
-
-        m_collectablesTotalCount = m_collectablesCounter = GameObject.FindGameObjectsWithTag("PickUp").Length;
+        m_collectablesCounter = m_collectablesCounter++;
 
         SetCountText();
 
@@ -60,12 +58,16 @@ public class Player_Controller : MonoBehaviour
 
     void SetCountText()
     {
-        countText.text = "Count: " + count.ToString();
 
-        if (count>= 31 )
+        m_collectablesCounter = m_collectablesCounter++;
+        
+        countText.text = "Coins: " + m_collectablesCounter.ToString() + " / " + m_collectablesTotalCount.ToString();
+
+        if (count >= 8 )
         {
             winTextObject.SetActive(true);
             gameoverTextObject.SetActive(false);
+
         }
 
     }
@@ -83,23 +85,22 @@ public class Player_Controller : MonoBehaviour
         {
             other.gameObject.SetActive(false);
 
-            count = count + 1;
+            countText.text = "Coins: " + m_collectablesCounter.ToString() + " / " + m_collectablesTotalCount.ToString();
 
             SetCountText();
 
-            m_collectablesCounter--;
-            if (m_collectablesCounter == 0)
+            m_collectablesCounter++;
+
+            if (m_collectablesCounter == 8)
             {
                 UnityEngine.Debug.Log("Winner!!!");
-                UnityEngine.Debug.Log($"Your time is {m_stopwatch.Elapsed} you get {m_collectablesTotalCount} diamont.");
-#if UNITY_EDITOR 
-                UnityEditor.EditorApplication.ExitPlaymode();
-#endif
+                UnityEngine.Debug.Log($"Your time is {m_stopwatch.Elapsed} you get {m_collectablesTotalCount} coins.");
+                StartCoroutine(waitALittleBit());
 
-            }
+           }
             else
             {
-                UnityEngine.Debug.Log($"You've already found {m_collectablesTotalCount - m_collectablesCounter} of {m_collectablesTotalCount} diamont!");
+                UnityEngine.Debug.Log($"You've already found {m_collectablesTotalCount - m_collectablesCounter} of {m_collectablesTotalCount} coins!");
             }
         }
         else if (other.gameObject.CompareTag("Enemy"))
@@ -108,12 +109,15 @@ public class Player_Controller : MonoBehaviour
 
             gameoverTextObject.SetActive(true);
 
-
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.ExitPlaymode();
-#endif
+            StartCoroutine(waitALittleBit());
 
         }
     }
-   
+    public IEnumerator waitALittleBit()
+    {
+        yield return new WaitForSeconds(5);
+#if UNITY_EDITOR 
+        UnityEditor.EditorApplication.ExitPlaymode();
+#endif
+    }
 }
