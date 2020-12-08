@@ -63,7 +63,7 @@ public class Player_Controller : MonoBehaviour
         
         countText.text = "Coins: " + m_collectablesCounter.ToString() + " / " + m_collectablesTotalCount.ToString();
 
-        if (count >= 8 )
+        if (count == 7 )
         {
             winTextObject.SetActive(true);
             gameoverTextObject.SetActive(false);
@@ -91,8 +91,9 @@ public class Player_Controller : MonoBehaviour
 
             m_collectablesCounter++;
 
-            if (m_collectablesCounter == 8)
+            if (m_collectablesCounter == 7)
             {
+                winTextObject.SetActive(true);
                 UnityEngine.Debug.Log("Winner!!!");
                 UnityEngine.Debug.Log($"Your time is {m_stopwatch.Elapsed} you get {m_collectablesTotalCount} coins.");
                 StartCoroutine(waitALittleBit());
